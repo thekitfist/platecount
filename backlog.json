@@ -1,0 +1,1176 @@
+{
+  "project": "PlateCount",
+  "epics": {
+    "E1": "Accounts, Roles & Chapter Setup",
+    "E2": "Meal Schedule",
+    "E3": "Meal Attendance (Sign-in / Sign-out)",
+    "E4": "Late Plates",
+    "E5": "Dietary Restrictions & Allergies",
+    "E6": "Kitchen Headcount Dashboard",
+    "E7": "Notifications",
+    "E8": "Attendance Data & Forecasting",
+    "E9": "Ordering & Cost (Future)",
+    "NFR": "Non-Functional Requirements"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "epic": "E1",
+      "title": "Member registration",
+      "story": "As a member, I want to create an account with my university email so that my meal responses are tied to me.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [],
+      "tags": [
+        "auth",
+        "onboarding"
+      ],
+      "acceptance_criteria": [
+        "Registration requires a valid email and password",
+        "Email must be verified before the account is active",
+        "Duplicate emails are rejected"
+      ],
+      "blocks": [
+        "REQ-002",
+        "REQ-025"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "epic": "E1",
+      "title": "Login, logout and password reset",
+      "story": "As a user, I want to log in, log out and reset a forgotten password so that I can access my account securely.",
+      "type": "Functional",
+      "stakeholder": "All users",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-001"
+      ],
+      "tags": [
+        "auth",
+        "security"
+      ],
+      "acceptance_criteria": [
+        "Valid credentials start a session; invalid ones show a generic error",
+        "Password reset link is emailed and expires after 1 hour",
+        "Logout ends the session on that device"
+      ],
+      "blocks": [
+        "REQ-003"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "epic": "E1",
+      "title": "Role-based access",
+      "story": "As a chapter admin, I want users assigned roles (Member, Kitchen Staff, House Director, Chapter Admin) so that each person sees only what they need.",
+      "type": "Functional",
+      "stakeholder": "Chapter Admin",
+      "priority": "Must",
+      "points": 5,
+      "depends_on": [
+        "REQ-002"
+      ],
+      "tags": [
+        "auth",
+        "security",
+        "permissions"
+      ],
+      "acceptance_criteria": [
+        "Each user has exactly one role per chapter",
+        "Permissions are enforced on the server, not only hidden in the UI",
+        "Only Chapter Admins can change roles"
+      ],
+      "blocks": [
+        "REQ-004",
+        "REQ-028",
+        "NFR-003"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "epic": "E1",
+      "title": "Chapter setup and join code",
+      "story": "As a chapter admin, I want to create my house and invite members with a join code so that onboarding a whole chapter is fast.",
+      "type": "Functional",
+      "stakeholder": "Chapter Admin",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-003"
+      ],
+      "tags": [
+        "onboarding",
+        "multi-tenant"
+      ],
+      "acceptance_criteria": [
+        "Admin can create a chapter with name, address and timezone",
+        "A join code is generated and can be regenerated",
+        "Members who join with the code are pending until approved"
+      ],
+      "blocks": [
+        "REQ-005",
+        "REQ-007",
+        "NFR-009"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "epic": "E1",
+      "title": "Roster management",
+      "story": "As a chapter admin, I want to approve, remove and label members as live-in or live-out so that the roster matches who actually eats at the house.",
+      "type": "Functional",
+      "stakeholder": "Chapter Admin",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-004"
+      ],
+      "tags": [
+        "admin",
+        "roster"
+      ],
+      "acceptance_criteria": [
+        "Admin can approve or reject pending members",
+        "Admin can deactivate a member without deleting history",
+        "Each member is labeled live-in or live-out"
+      ],
+      "blocks": [
+        "REQ-006"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "epic": "E1",
+      "title": "Meal plan types",
+      "story": "As a house director, I want to assign each member a meal plan (e.g., full, lunch-only, none) so that only eligible members appear in each meal's count.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Should",
+      "points": 2,
+      "depends_on": [
+        "REQ-005"
+      ],
+      "tags": [
+        "roster",
+        "configuration"
+      ],
+      "acceptance_criteria": [
+        "Plans define which meals a member is eligible for",
+        "Ineligible members cannot sign in to those meals",
+        "Changing a plan affects future meals only"
+      ],
+      "blocks": [
+        "REQ-011"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "epic": "E2",
+      "title": "Recurring meal schedule",
+      "story": "As a house director, I want to define the weekly meal schedule with serve times and a sign-out cutoff for each meal so that members know the deadlines.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Must",
+      "points": 5,
+      "depends_on": [
+        "REQ-004"
+      ],
+      "tags": [
+        "scheduling",
+        "configuration"
+      ],
+      "acceptance_criteria": [
+        "Each meal has a name, days of week, serve time and cutoff",
+        "Meals are generated for the semester from the template",
+        "Cutoff is stored in the chapter's timezone"
+      ],
+      "blocks": [
+        "REQ-008",
+        "REQ-009",
+        "REQ-010",
+        "REQ-011",
+        "NFR-005"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "epic": "E2",
+      "title": "Schedule exceptions",
+      "story": "As a house director, I want to cancel or add individual meals for holidays, breaks and chapter events so that the schedule reflects reality.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-007"
+      ],
+      "tags": [
+        "scheduling"
+      ],
+      "acceptance_criteria": [
+        "A single meal or a date range can be cancelled",
+        "One-off meals can be added",
+        "Cancelled meals are hidden from members and excluded from reports"
+      ],
+      "blocks": [
+        "REQ-030",
+        "REQ-033"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "epic": "E2",
+      "title": "Post menu",
+      "story": "As kitchen staff, I want to post the menu for each meal so that members can decide whether to eat.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Could",
+      "points": 2,
+      "depends_on": [
+        "REQ-007"
+      ],
+      "tags": [
+        "menu"
+      ],
+      "acceptance_criteria": [
+        "Staff can add or edit menu text per meal",
+        "Menu changes after posting are timestamped"
+      ],
+      "blocks": [
+        "REQ-038"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "epic": "E2",
+      "title": "View upcoming meals",
+      "story": "As a member, I want to see the upcoming meals, their cutoffs and my current status so that I don't miss a deadline.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 2,
+      "depends_on": [
+        "REQ-007"
+      ],
+      "tags": [
+        "member-ui"
+      ],
+      "acceptance_criteria": [
+        "Shows at least the next 7 days of meals",
+        "Each meal shows serve time, cutoff, my status and menu if posted"
+      ],
+      "blocks": [
+        "REQ-012"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "epic": "E3",
+      "title": "Default attendance mode",
+      "story": "As a house director, I want to choose whether members are counted in or out by default so that the system matches how my house already works.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-006",
+        "REQ-007"
+      ],
+      "tags": [
+        "attendance",
+        "configuration"
+      ],
+      "acceptance_criteria": [
+        "Chapter setting: default-in (sign out to skip) or default-out (sign in to eat)",
+        "Default applies to every eligible member for every generated meal",
+        "Changing the mode affects future meals only"
+      ],
+      "blocks": [
+        "REQ-012"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "epic": "E3",
+      "title": "Sign in / sign out of a meal",
+      "story": "As a member, I want to change my status for a meal in two taps or fewer so that responding is effortless.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-010",
+        "REQ-011"
+      ],
+      "tags": [
+        "attendance",
+        "member-ui",
+        "core"
+      ],
+      "acceptance_criteria": [
+        "Status toggles from the meal list without opening another page",
+        "Change is reflected in the live headcount within 5 seconds",
+        "Confirmation is shown to the member"
+      ],
+      "blocks": [
+        "REQ-013",
+        "REQ-014",
+        "REQ-015",
+        "REQ-016",
+        "REQ-017",
+        "REQ-018",
+        "REQ-021",
+        "NFR-002"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "epic": "E3",
+      "title": "Cutoff enforcement",
+      "story": "As kitchen staff, I want changes locked after the cutoff so that the count I cook for doesn't move.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "attendance",
+        "business-rule"
+      ],
+      "acceptance_criteria": [
+        "Members cannot change status after cutoff",
+        "Staff and House Director can still override with a note",
+        "UI shows a countdown to cutoff"
+      ],
+      "blocks": [
+        "REQ-022",
+        "REQ-029"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "epic": "E3",
+      "title": "Standing weekly preferences",
+      "story": "As a member, I want to set recurring preferences (e.g., always out for Friday dinner) so that I don't have to respond every week.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "attendance",
+        "automation"
+      ],
+      "acceptance_criteria": [
+        "Member can set a preference per meal slot",
+        "Preferences apply to newly generated meals",
+        "One-off changes override the standing preference"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-015",
+      "epic": "E3",
+      "title": "Bulk sign-out for a date range",
+      "story": "As a member, I want to sign out of every meal between two dates so that I can handle trips and breaks at once.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Should",
+      "points": 2,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "attendance"
+      ],
+      "acceptance_criteria": [
+        "Member picks a start and end date",
+        "All eligible meals in range are set to out",
+        "Meals past cutoff are not changed"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-016",
+      "epic": "E3",
+      "title": "Guests",
+      "story": "As a member, I want to add guests to a meal so that the kitchen accounts for visitors.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Could",
+      "points": 2,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "attendance"
+      ],
+      "acceptance_criteria": [
+        "Member can add 1-3 guests per meal before cutoff",
+        "Guests are shown separately in the headcount",
+        "House Director can disable guests"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-017",
+      "epic": "E3",
+      "title": "Attendance change log",
+      "story": "As a house director, I want a log of who changed what and when so that disputes can be resolved.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "audit",
+        "data"
+      ],
+      "acceptance_criteria": [
+        "Every status change records user, old value, new value and timestamp",
+        "Log is read-only and filterable by member and meal"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-018",
+      "epic": "E4",
+      "title": "Request a late plate",
+      "story": "As a member, I want to request a late plate before the cutoff with a pickup note so that I can eat when class runs late.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "late-plate",
+        "core"
+      ],
+      "acceptance_criteria": [
+        "Request available only before cutoff",
+        "Optional note (e.g., pickup time, no onions)",
+        "Requesting a late plate counts the member as eating"
+      ],
+      "blocks": [
+        "REQ-019"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "epic": "E4",
+      "title": "Late plate list and labels",
+      "story": "As kitchen staff, I want a list of late plates with printable name labels so that I can package them without texts.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Must",
+      "points": 2,
+      "depends_on": [
+        "REQ-018",
+        "REQ-021"
+      ],
+      "tags": [
+        "late-plate",
+        "kitchen-ui"
+      ],
+      "acceptance_criteria": [
+        "List shows name, note and dietary flags",
+        "Labels print on a standard sheet"
+      ],
+      "blocks": [
+        "REQ-020",
+        "REQ-027"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "epic": "E4",
+      "title": "Late plate pickup tracking",
+      "story": "As kitchen staff, I want to mark late plates picked up or not so that we can track waste from uncollected plates.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Could",
+      "points": 2,
+      "depends_on": [
+        "REQ-019"
+      ],
+      "tags": [
+        "late-plate",
+        "data"
+      ],
+      "acceptance_criteria": [
+        "Each late plate can be marked picked up / not picked up",
+        "Uncollected late plates feed waste reports"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-021",
+      "epic": "E6",
+      "title": "Live headcount",
+      "story": "As kitchen staff, I want a live count of who is eating each meal so that I know how much to prepare.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Must",
+      "points": 5,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "dashboard",
+        "real-time",
+        "core"
+      ],
+      "acceptance_criteria": [
+        "Shows total in, total out, guests and late plates",
+        "Updates without a page refresh",
+        "Shows today's meals first"
+      ],
+      "blocks": [
+        "REQ-019",
+        "REQ-022",
+        "REQ-023",
+        "REQ-026",
+        "NFR-006"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "epic": "E6",
+      "title": "Final count at cutoff",
+      "story": "As kitchen staff, I want the count frozen at cutoff with a timestamp so that I have a reliable number to cook to.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Must",
+      "points": 2,
+      "depends_on": [
+        "REQ-013",
+        "REQ-021"
+      ],
+      "tags": [
+        "dashboard",
+        "business-rule"
+      ],
+      "acceptance_criteria": [
+        "Final count is saved when cutoff passes",
+        "Later overrides are shown as adjustments, not silent changes"
+      ],
+      "blocks": [
+        "REQ-024",
+        "REQ-032",
+        "NFR-006"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "epic": "E6",
+      "title": "Kitchen tablet view",
+      "story": "As kitchen staff, I want a large, glanceable view for a kitchen tablet so that I can check the count while cooking.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-021"
+      ],
+      "tags": [
+        "kitchen-ui",
+        "ux"
+      ],
+      "acceptance_criteria": [
+        "Large-type layout readable from about 2 meters",
+        "Stays awake / auto-refreshes during meal windows"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-024",
+      "epic": "E6",
+      "title": "Manual count adjustment",
+      "story": "As kitchen staff, I want to record walk-ins and the number actually served so that the data reflects reality.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Should",
+      "points": 2,
+      "depends_on": [
+        "REQ-022"
+      ],
+      "tags": [
+        "dashboard",
+        "data"
+      ],
+      "acceptance_criteria": [
+        "Staff enter actual served count after the meal",
+        "Adjustments require a short reason"
+      ],
+      "blocks": [
+        "REQ-032"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "epic": "E5",
+      "title": "Dietary profile",
+      "story": "As a member, I want to record my dietary restrictions and allergies once so that the kitchen always knows.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-001"
+      ],
+      "tags": [
+        "dietary",
+        "privacy",
+        "health-data"
+      ],
+      "acceptance_criteria": [
+        "Choose from a standard list (vegetarian, vegan, gluten-free, nut allergy, etc.) plus free text",
+        "Member can edit or clear the profile at any time"
+      ],
+      "blocks": [
+        "REQ-026",
+        "REQ-027",
+        "REQ-028",
+        "NFR-004"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "epic": "E5",
+      "title": "Dietary breakdown on headcount",
+      "story": "As kitchen staff, I want each meal's count broken down by restriction so that I prepare the right number of alternate plates.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-021",
+        "REQ-025"
+      ],
+      "tags": [
+        "dietary",
+        "dashboard"
+      ],
+      "acceptance_criteria": [
+        "Shows counts per restriction for members marked in",
+        "Severe allergies are visually highlighted"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-027",
+      "epic": "E5",
+      "title": "Allergy flags on late plate labels",
+      "story": "As kitchen staff, I want allergy flags printed on late plate labels so that a plate never goes to the wrong person.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Should",
+      "points": 2,
+      "depends_on": [
+        "REQ-019",
+        "REQ-025"
+      ],
+      "tags": [
+        "dietary",
+        "late-plate",
+        "safety"
+      ],
+      "acceptance_criteria": [
+        "Labels include allergy icons/text for that member"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-028",
+      "epic": "E5",
+      "title": "Dietary data visibility",
+      "story": "As a member, I want my dietary and allergy information visible only to kitchen staff and the house director so that my health information stays private.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 2,
+      "depends_on": [
+        "REQ-003",
+        "REQ-025"
+      ],
+      "tags": [
+        "privacy",
+        "security",
+        "health-data"
+      ],
+      "acceptance_criteria": [
+        "Other members cannot see dietary data",
+        "Access is enforced server-side by role"
+      ],
+      "blocks": [
+        "NFR-004"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "epic": "E7",
+      "title": "Cutoff reminders",
+      "story": "As a member, I want a reminder before cutoff so that I remember to update my status.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Should",
+      "points": 5,
+      "depends_on": [
+        "REQ-013"
+      ],
+      "tags": [
+        "notifications"
+      ],
+      "acceptance_criteria": [
+        "Reminder sent a configurable time before cutoff (default 2 hours)",
+        "Delivered by push or email"
+      ],
+      "blocks": [
+        "REQ-030",
+        "REQ-031"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "epic": "E7",
+      "title": "Meal change alerts",
+      "story": "As a member, I want to be notified when a meal is cancelled or the menu changes so that I can adjust my plans.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Could",
+      "points": 3,
+      "depends_on": [
+        "REQ-008",
+        "REQ-029"
+      ],
+      "tags": [
+        "notifications"
+      ],
+      "acceptance_criteria": [
+        "Cancellation alerts go to everyone signed in to that meal",
+        "Menu change alerts are opt-in"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-031",
+      "epic": "E7",
+      "title": "Notification preferences",
+      "story": "As a member, I want to control which notifications I get and how so that the app isn't annoying.",
+      "type": "Functional",
+      "stakeholder": "Member",
+      "priority": "Could",
+      "points": 2,
+      "depends_on": [
+        "REQ-029"
+      ],
+      "tags": [
+        "notifications",
+        "settings"
+      ],
+      "acceptance_criteria": [
+        "Per-type on/off toggles",
+        "Choose push, email or both"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-032",
+      "epic": "E8",
+      "title": "Store attendance actuals",
+      "story": "As a house director, I want every meal's final count, adjustments and actual served stored so that we can analyze attendance over time.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-022",
+        "REQ-024"
+      ],
+      "tags": [
+        "data",
+        "data-engineering",
+        "analytics"
+      ],
+      "acceptance_criteria": [
+        "One record per meal with final count, adjustments, served count and late plates",
+        "Data retained for at least 2 academic years"
+      ],
+      "blocks": [
+        "REQ-034",
+        "REQ-037",
+        "REQ-039"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "epic": "E8",
+      "title": "Calendar event tags",
+      "story": "As a house director, I want to tag dates (exam week, home game, break, chapter event) so that forecasts account for unusual days.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-008"
+      ],
+      "tags": [
+        "data",
+        "forecasting"
+      ],
+      "acceptance_criteria": [
+        "Tags apply to a date or date range",
+        "Tags are visible on the meal schedule"
+      ],
+      "blocks": [
+        "REQ-035"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "epic": "E8",
+      "title": "Baseline turnout forecast",
+      "story": "As kitchen staff, I want a predicted turnout for upcoming meals based on history so that I can plan before members respond.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Should",
+      "points": 5,
+      "depends_on": [
+        "REQ-032"
+      ],
+      "tags": [
+        "forecasting",
+        "data-engineering",
+        "analytics"
+      ],
+      "acceptance_criteria": [
+        "Forecast uses a moving average by meal and day of week",
+        "Shown beside the live count for meals in the next 7 days",
+        "Hidden until at least 3 weeks of data exist"
+      ],
+      "blocks": [
+        "REQ-035",
+        "REQ-036",
+        "REQ-038"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "epic": "E8",
+      "title": "Event-adjusted forecast",
+      "story": "As kitchen staff, I want forecasts adjusted for exam weeks, game days and breaks so that predictions stay accurate on unusual days.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Could",
+      "points": 8,
+      "depends_on": [
+        "REQ-033",
+        "REQ-034"
+      ],
+      "tags": [
+        "forecasting",
+        "data-engineering"
+      ],
+      "acceptance_criteria": [
+        "Forecast applies a learned adjustment factor per tag",
+        "Shows which tags influenced the prediction"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-036",
+      "epic": "E8",
+      "title": "Forecast accuracy report",
+      "story": "As a house director, I want to compare forecast vs. actual so that I know whether to trust the predictions.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Could",
+      "points": 3,
+      "depends_on": [
+        "REQ-034"
+      ],
+      "tags": [
+        "analytics",
+        "reporting"
+      ],
+      "acceptance_criteria": [
+        "Shows forecast, actual and error for each past meal",
+        "Reports mean absolute error per meal type"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-037",
+      "epic": "E8",
+      "title": "Attendance and waste reports",
+      "story": "As a house director, I want reports on no-show rates, late plate pickup and attendance trends, exportable to CSV, so that I can reduce waste and justify budget decisions.",
+      "type": "Functional",
+      "stakeholder": "House Director",
+      "priority": "Should",
+      "points": 5,
+      "depends_on": [
+        "REQ-032"
+      ],
+      "tags": [
+        "analytics",
+        "reporting",
+        "data"
+      ],
+      "acceptance_criteria": [
+        "Filter by date range and meal",
+        "Includes no-show rate (counted in but not served)",
+        "Export to CSV"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-038",
+      "epic": "E9",
+      "title": "Portion and ingredient suggestions",
+      "story": "As kitchen staff, I want ingredient quantities suggested from the forecast and recipe yields so that ordering is less guesswork.",
+      "type": "Functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Won't (this term)",
+      "points": 8,
+      "depends_on": [
+        "REQ-009",
+        "REQ-034"
+      ],
+      "tags": [
+        "ordering",
+        "future"
+      ],
+      "acceptance_criteria": [
+        "Recipes store yield per serving",
+        "Suggested quantities scale with the forecast"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "REQ-039",
+      "epic": "E9",
+      "title": "Food cost tracking",
+      "story": "As a chapter treasurer, I want cost per meal and per member tracked so that the chapter can see the money saved by reducing waste.",
+      "type": "Functional",
+      "stakeholder": "Chapter Treasurer",
+      "priority": "Won't (this term)",
+      "points": 5,
+      "depends_on": [
+        "REQ-032"
+      ],
+      "tags": [
+        "finance",
+        "future"
+      ],
+      "acceptance_criteria": [
+        "Staff enter grocery spend per week",
+        "Reports cost per meal served"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-001",
+      "epic": "NFR",
+      "title": "Mobile-first responsive UI",
+      "story": "The member interface shall be fully usable on phone screens 360px wide and up.",
+      "type": "Non-functional",
+      "stakeholder": "All users",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [],
+      "tags": [
+        "usability",
+        "mobile"
+      ],
+      "acceptance_criteria": [
+        "All member flows work at 360px width without horizontal scrolling"
+      ],
+      "blocks": [
+        "NFR-008"
+      ]
+    },
+    {
+      "id": "NFR-002",
+      "epic": "NFR",
+      "title": "Response time",
+      "story": "Sign-in/out actions shall complete in under 1 second at the 95th percentile for a chapter of 150 members.",
+      "type": "Non-functional",
+      "stakeholder": "Member",
+      "priority": "Should",
+      "points": 2,
+      "depends_on": [
+        "REQ-012"
+      ],
+      "tags": [
+        "performance"
+      ],
+      "acceptance_criteria": [
+        "Load test with 150 concurrent users meets the target"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-003",
+      "epic": "NFR",
+      "title": "Security baseline",
+      "story": "The system shall hash passwords, use HTTPS everywhere and enforce role permissions server-side.",
+      "type": "Non-functional",
+      "stakeholder": "All users",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-003"
+      ],
+      "tags": [
+        "security"
+      ],
+      "acceptance_criteria": [
+        "Passwords hashed with a modern algorithm (bcrypt/argon2)",
+        "No endpoint returns data outside the user's role"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-004",
+      "epic": "NFR",
+      "title": "Health data privacy",
+      "story": "Dietary and allergy data shall be collected minimally, visible only to authorized roles and deletable by the member.",
+      "type": "Non-functional",
+      "stakeholder": "Member",
+      "priority": "Must",
+      "points": 2,
+      "depends_on": [
+        "REQ-025",
+        "REQ-028"
+      ],
+      "tags": [
+        "privacy",
+        "health-data"
+      ],
+      "acceptance_criteria": [
+        "Member can delete their dietary profile",
+        "Access to dietary data is logged"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-005",
+      "epic": "NFR",
+      "title": "Timezone correctness",
+      "story": "All schedules and cutoffs shall be evaluated in the chapter's local timezone, including daylight saving changes.",
+      "type": "Non-functional",
+      "stakeholder": "House Director",
+      "priority": "Must",
+      "points": 2,
+      "depends_on": [
+        "REQ-007"
+      ],
+      "tags": [
+        "reliability",
+        "scheduling"
+      ],
+      "acceptance_criteria": [
+        "Cutoffs fire correctly across a DST transition in tests"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-006",
+      "epic": "NFR",
+      "title": "Headcount consistency",
+      "story": "Concurrent status changes near the cutoff shall never produce an incorrect final count.",
+      "type": "Non-functional",
+      "stakeholder": "Kitchen Staff",
+      "priority": "Must",
+      "points": 3,
+      "depends_on": [
+        "REQ-021",
+        "REQ-022"
+      ],
+      "tags": [
+        "reliability",
+        "concurrency"
+      ],
+      "acceptance_criteria": [
+        "Simultaneous updates are serialized or transactional",
+        "Final count equals the sum of stored statuses"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-007",
+      "epic": "NFR",
+      "title": "Availability during meal windows",
+      "story": "The system shall be available 99% of the time during meal windows.",
+      "type": "Non-functional",
+      "stakeholder": "All users",
+      "priority": "Should",
+      "points": 2,
+      "depends_on": [],
+      "tags": [
+        "reliability",
+        "ops"
+      ],
+      "acceptance_criteria": [
+        "Uptime monitoring and alerting in place"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-008",
+      "epic": "NFR",
+      "title": "Accessibility",
+      "story": "The UI shall meet WCAG 2.1 AA.",
+      "type": "Non-functional",
+      "stakeholder": "All users",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "NFR-001"
+      ],
+      "tags": [
+        "accessibility"
+      ],
+      "acceptance_criteria": [
+        "Passes automated accessibility checks",
+        "Fully usable with keyboard and screen reader"
+      ],
+      "blocks": []
+    },
+    {
+      "id": "NFR-009",
+      "epic": "NFR",
+      "title": "Multi-chapter data isolation",
+      "story": "Data for each chapter shall be isolated so that houses never see each other's data.",
+      "type": "Non-functional",
+      "stakeholder": "Chapter Admin",
+      "priority": "Should",
+      "points": 3,
+      "depends_on": [
+        "REQ-004"
+      ],
+      "tags": [
+        "security",
+        "multi-tenant",
+        "scalability"
+      ],
+      "acceptance_criteria": [
+        "Every query is scoped by chapter",
+        "Automated tests verify cross-chapter access is denied"
+      ],
+      "blocks": []
+    }
+  ]
+}
